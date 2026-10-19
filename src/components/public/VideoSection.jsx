@@ -2,6 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { Film, Play, Sparkles } from 'lucide-react';
 import { getMediaUrl } from '../../utils/media';
 
+function formatVideoEmbedUrl(url) {
+  if (!url) return '';
+  if (url.includes('youtube.com/watch?v=')) {
+    return url.replace('watch?v=', 'embed/').split('&')[0];
+  }
+  if (url.includes('youtu.be/')) {
+    const id = url.split('youtu.be/')[1]?.split('?')[0];
+    return `https://www.youtube.com/embed/${id}`;
+  }
+  if (url.includes('youtube.com/shorts/')) {
+    const id = url.split('youtube.com/shorts/')[1]?.split('?')[0];
+    return `https://www.youtube.com/embed/${id}`;
+  }
+  if (url.includes('drive.google.com/file/d/')) {
+    return url.replace(/\/view.*$/, '/preview');
+  }
+  return url;
+}
+
 export default function VideoSection({ video, videos = [] }) {
   const allVideos = videos.length > 0 ? videos : (video ? [video] : []);
   const [activeVideo, setActiveVideo] = useState(allVideos[0] || video);
