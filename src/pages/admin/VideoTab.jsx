@@ -42,6 +42,7 @@ export default function VideoTab({ showToast }) {
   const [editingVideo, setEditingVideo] = useState(null);
   const [editTitle, setEditTitle] = useState('');
   const [editDesc, setEditDesc] = useState('');
+  const [editVideoUrl, setEditVideoUrl] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
 
   const fileInputRef = useRef(null);
@@ -186,6 +187,7 @@ export default function VideoTab({ showToast }) {
     setEditingVideo(v);
     setEditTitle(v.title || '');
     setEditDesc(v.description || '');
+    setEditVideoUrl(v.videoUrl || '');
   };
 
   const handleSaveEdit = async (e) => {
@@ -193,12 +195,17 @@ export default function VideoTab({ showToast }) {
     if (!editingVideo) return;
     try {
       setSavingEdit(true);
-      const res = await updateVideo(editingVideo._id, {
+      const updatePayload = {
         title: editTitle.trim() || 'Bhai Jaan Birthday Video',
-        description: editDesc.trim()
-      });
+        description: editDesc.trim(),
+        videoUrl: editVideoUrl.trim()
+      };
+      if (editVideoUrl.trim()) {
+        updatePayload.videoType = 'url';
+      }
+      const res = await updateVideo(editingVideo._id, updatePayload);
       if (res.data.success) {
-        showToast('Video title aur description kamiyabi se update hogaya! ✅', 'success');
+        showToast('Video kamiyabi se update hogayi! ✅', 'success');
         setEditingVideo(null);
         loadVideos();
       }
@@ -686,6 +693,22 @@ export default function VideoTab({ showToast }) {
                   placeholder="Bhai jaan ke liye pyara description ya scene ki tafseel..."
                   className="w-full px-3.5 py-2.5 rounded-xl bg-[#022c22] border border-[#d4af37]/30 text-xs text-[#fdfbf7] focus:outline-none focus:border-[#d4af37]"
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-cinzel uppercase text-[#d4af37] mb-1">
+                  Video Link (YouTube Unlisted / Google Drive / URL)
+                </label>
+                <input
+                  type="text"
+                  value={editVideoUrl}
+                  onChange={(e) => setEditVideoUrl(e.target.value)}
+                  placeholder="https://www.youtube.com/watch?v=... ya youtu.be/..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#022c22] border border-[#d4af37]/30 text-sm text-[#fdfbf7] focus:outline-none focus:border-[#d4af37]"
+                />
+                <p className="text-[10px] text-[#fdfbf7]/60 mt-1">
+                  💡 Live Render/Vercel par YouTube ka Unlisted video link paste karein taake video HD mein bina kisi buffering ke chal sake.
+                </p>
               </div>
 
               <div className="flex justify-end gap-3 pt-4 border-t border-[#d4af37]/20">
